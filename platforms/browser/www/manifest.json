@@ -1,0 +1,12 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "name": "kaufenapp",
+  "short_name": "kaufenapp",
+  "version": "io.cordova.hellocordova",
+  "description": "An app that lets a store owner manage their store from their Android mobile device.",
+  "author": "Christian Meier",
+  "icons": [],
+  "start_url": "index.html",
+  "theme_color": "#2196f3"
+}

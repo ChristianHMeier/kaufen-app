@@ -1,0 +1,68 @@
+<div class="page" data-name="history">
+  <div class="navbar">
+    <div class="navbar-inner sliding">
+      <div class="left">
+        <a href="#" class="link back">
+          <i class="icon icon-back"></i>
+          <span class="ios-only">Back</span>
+        </a>
+      </div>
+      <div class="title">Order History (Currently on dummy values)</div>
+    </div>
+  </div>
+  <div class="page-content">
+    <div class="block-title">Order History</div>
+    <div class="data-table">
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th class="numeric-cell">Order #</th>
+            <th class="label-cell">Date</th>
+            <th class="numeric-cell">Amount (€)</th>
+            <th class="label-cell"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="numeric-cell">5</td>
+            <td class="label-cell">2018-11-01</td>
+            <td class="numeric-cell">42</td>
+            <td class="label-cell">
+              <a href="/order/5/" class="button button-fill button-raised color-green">Details</a>
+            </td>
+          </tr>
+        </tbody>
+        <tfooter>
+          <tr>
+            <th class="numeric-cell">Order #</th>
+            <th class="label-cell">Date</th>
+            <th class="numeric-cell">Amount (€)</th>
+            <th class="label-cell"></th>
+          </tr>
+        </tfooter>
+      </table>
+      <div class="data-table-footer">
+        <div class="data-table-rows-select">
+          Per page:
+          <div class="input input-dropdown">
+            <select>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+        <div class="data-table-pagination">
+          <span class="data-table-pagination-label">1 of 10</span>
+          <a href="#" class="link disabled">
+            <i class="icon icon-prev color-gray"></i>
+          </a>
+          <a href="#" class="link">
+            <i class="icon icon-next color-gray"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
