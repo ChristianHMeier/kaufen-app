@@ -33,43 +33,12 @@ var mainView = app.views.create('.view-main', {
 
 var userId;
 var securityToken;
+var hashed;
 
-// Login Screen Demo
-$$('#my-login-screen .login-button').on('click', function () {
-  var username = $$('#my-login-screen [name="username"]').val();
-  var password = $$('#my-login-screen [name="password"]').val();
-
-  //$$("#dashboardLink").click();
-
-  /*var mainView = app.views.create('.view-main', {
-    url: '/dashboard/'
-  });*/
-  app.request({
-    url: 'http://35.200.224.144:8090/api/v1/login',
-    //headers: {Authorization: "Bearer "},
-    method: 'POST',
-    dataType: 'json',
-    data: {emailId: username, password: password},
-    success: function (data, status, xhr) {
-    //console.log(data);
-    //console.log(status);
-    //console.log(xhr.getResponseHeader('authorization'));
-    //console.log(xhr.getResponseHeader('pragma'));
-    userId = data.user.id;
-    securityToken = data.user.token;
-    $$('#my-login-screen [name="username"]').val('');
-    $$('#my-login-screen [name="password"]').val('');
-    $$("#dashboardLink").click();
-  }});
-  //var mainView = app.addView('.view-main')
-
-// Load page from about.html file to main View:
-  //mainView.router.loadPage('pages/dashboard.html');
-  // Close login screen
-  //app.loginScreen.close('#my-login-screen');
-
-  // Alert username and password
-  //app.dialog.alert('Username: ' + username + '<br>Password: ' + password);
+loginStart();
+$$(document).on('page:init', '.page[data-name="home"]', function (e)
+{
+  loginStart();
 });
 $$(document).on('page:init', '.page[data-name="dashboard"]', function (e)
 {
@@ -120,6 +89,7 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
     {
         var dataPost = {
           "categoryId": $$('#category').val(),
+          "categoryName": $$('#category').val(),
           "depth": $$('#depth').val(),
           "description": $$('#description').val(),
           "height": $$('#height').val(),
@@ -128,19 +98,21 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           "price": $$('#price').val(),
           "prodCondition": $$('#prodCondition').val(),
           "productName": $$('#name').val(),
-          "publicationDate": new Date().toISOString().slice(0, 19).replace('T', ' '),
+          "publicationDate": new Date().toISOString().slice(0, 28),//19).replace('T', ' '),
           "sellerId":userId,
           "slug": $$('#name').val().toLowerCase().replace(' ', '-'),
           "stock": $$('#stock').val(),
           "type": $$('#type').val(),
           "weight": $$('#weight').val()
         };
+        alert(JSON.stringify(dataPost));
         app.request({
           url: 'http://35.200.224.144:8090/api/v1/product',
           headers: {Authorization: "Bearer "+securityToken},
           method: 'POST',
+          contentType: 'application/json',
           dataType: 'json',
-          data: {'product': dataPost},
+          data: '{"product":'+JSON.stringify(dataPost)+'}',
           success: function (data, status, xhr) {
           //alert(JSON.stringify(data));
             $$('#userForm').hide();
@@ -153,32 +125,81 @@ $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
   $$('#feedback').hide();
   $$('#register').on('click', function()
   {
-      var dataPost = {
-        "address": $$('#address').val(),
-        "alias": $$('#alias').val(),
-        "authorities": {
-          "authority": "ROLE_USER"
-        },
-        "city": $$('#city').val(),
-        "country": $$('#country').val(),
-        "emailId": $$('#email').val(),
-        "firstName": $$('#firstName').val(),
-        "lastName": $$('#surname').val(),
-        "password": $$('#pass').val(),
-        "phoneNo": $$('#phone').val(),
-        "postCode": $$('#postCode').val(),
-        "role": "ROLE_USER",
-        "state": $$('#state').val()
-      };
-      app.request({
-        url: 'http://35.200.224.144:8090/api/v1/user',
-        method: 'POST',
-        dataType: 'json',
-        data: {'userDTO': dataPost},
-        success: function (data, status, xhr) {
-        //alert(JSON.stringify(data));
-          $$('#userForm').hide();
-          $$('#feedback').show();
-      }});
+      var salt = gensalt(12);
+      hashpw($$('#pass').val(), salt, hashing);
   });
 });
+function hashing(hash)
+{
+  //alert('Hash is '+hash);
+  //hashed = hash;
+
+  var dataPost = {
+    "address": $$('#address').val(),
+    "alias": $$('#alias').val(),
+    /*"authorities": {
+      "authority": "ROLE_USER"
+    },*/
+    "city": $$('#city').val(),
+    "country": $$('#country').val(),
+    "emailId": $$('#email').val(),
+    "firstName": $$('#firstName').val(),
+    "lastName": $$('#surname').val(),
+    "password": hash,
+    "phoneNo": $$('#phone').val().replace(' ', ''),
+    "postCode": $$('#postCode').val(),
+    "role": "ROLE_USER",
+    "state": $$('#state').val()
+  };
+  app.request({
+    url: 'http://35.200.224.144:8090/api/v1/user',
+    method: 'POST',
+    contentType: 'application/json',//'multipart/form-data',
+    dataType: 'json',
+    data: JSON.stringify(dataPost),
+    success: function (data, status, xhr) {
+    //alert(JSON.stringify(data));
+      $$('#userForm').hide();
+      $$('#feedback').show();
+  }});
+}
+function loginStart()
+{
+  // Login Screen Demo
+  $$('#my-login-screen .login-button').on('click', function () {
+    var username = $$('#my-login-screen [name="username"]').val();
+    var password = $$('#my-login-screen [name="password"]').val();
+
+    //$$("#dashboardLink").click();
+
+    /*var mainView = app.views.create('.view-main', {
+      url: '/dashboard/'
+    });*/
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/login',
+      //headers: {Authorization: "Bearer "},
+      method: 'POST',
+      dataType: 'json',
+      data: {emailId: username, password: password},
+      success: function (data, status, xhr) {
+      //console.log(data);
+      //console.log(status);
+      //console.log(xhr.getResponseHeader('authorization'));
+      //console.log(xhr.getResponseHeader('pragma'));
+      userId = data.user.id;
+      securityToken = data.user.token;
+      $$('#my-login-screen [name="username"]').val('');
+      $$('#my-login-screen [name="password"]').val('');
+      $$("#dashboardLink").click();
+    }});
+  //var mainView = app.addView('.view-main')
+
+  // Load page from about.html file to main View:
+  //mainView.router.loadPage('pages/dashboard.html');
+  // Close login screen
+  //app.loginScreen.close('#my-login-screen');
+
+  // Alert username and password
+  //app.dialog.alert('Username: ' + username + '<br>Password: ' + password);
+  });
+}
