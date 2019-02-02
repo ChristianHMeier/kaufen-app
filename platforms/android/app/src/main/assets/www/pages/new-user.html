@@ -1,4 +1,4 @@
-<div class="page" data-name="form">
+<div class="page" data-name="new-user">
   <div class="navbar">
     <div class="navbar-inner sliding">
       <div class="left">
@@ -12,14 +12,14 @@
   </div>
   <div class="page-content">
     <div class="block-title">New User Details</div>
-    <div class="list no-hairlines-md">
+    <div id="userForm" class="list no-hairlines-md">
       <ul>
         <li>
           <div class="item-content item-input">
             <div class="item-inner">
               <div class="item-title item-label">First Name</div>
               <div class="item-input-wrap">
-                <input type="text" placeholder="First name"/>
+                <input type="text" id="firstName" placeholder="First name"/>
               </div>
             </div>
           </div>
@@ -29,7 +29,7 @@
               <div class="item-inner">
                 <div class="item-title item-label">Surname</div>
                 <div class="item-input-wrap">
-                  <input type="text" placeholder="Surname"/>
+                  <input type="text" id="surname" placeholder="Surname"/>
                 </div>
               </div>
             </div>
@@ -37,9 +37,9 @@
           <li>
             <div class="item-content item-input">
               <div class="item-inner">
-                <div class="item-title item-label">Alias</div>
+                <div class="item-title item-label">Username</div>
                 <div class="item-input-wrap">
-                  <input type="text" placeholder="Alias"/>
+                  <input type="text" id="alias" placeholder="Username"/>
                 </div>
               </div>
             </div>
@@ -49,7 +49,7 @@
                 <div class="item-inner">
                   <div class="item-title item-label">Email</div>
                   <div class="item-input-wrap">
-                    <input type="text" placeholder="email address"/>
+                    <input type="text" id="email" placeholder="email address"/>
                   </div>
                 </div>
               </div>
@@ -59,7 +59,7 @@
                 <div class="item-inner">
                   <div class="item-title item-label">Password</div>
                   <div class="item-input-wrap">
-                    <input type="password" placeholder="First name"/>
+                    <input type="password" id="pass" />
                   </div>
                 </div>
               </div>
@@ -69,7 +69,7 @@
                   <div class="item-inner">
                     <div class="item-title item-label">Country</div>
                     <div class="item-input-wrap">
-                      <input type="text" placeholder="Surname"/>
+                      <input type="text" id="country" placeholder="Country"/>
                     </div>
                   </div>
                 </div>
@@ -79,7 +79,7 @@
                   <div class="item-inner">
                     <div class="item-title item-label">State</div>
                     <div class="item-input-wrap">
-                      <input type="text" placeholder="Surname"/>
+                      <input type="text" id="state" placeholder="State"/>
                     </div>
                   </div>
                 </div>
@@ -89,7 +89,7 @@
                   <div class="item-inner">
                     <div class="item-title item-label">City</div>
                     <div class="item-input-wrap">
-                      <input type="text" placeholder="First name"/>
+                      <input type="text" id="city" placeholder="City" />
                     </div>
                   </div>
                 </div>
@@ -99,7 +99,7 @@
                     <div class="item-inner">
                       <div class="item-title item-label">Post Code</div>
                       <div class="item-input-wrap">
-                        <input type="text" placeholder="Surname"/>
+                        <input type="text" id="postCode" placeholder="Post code"/>
                       </div>
                     </div>
                   </div>
@@ -109,7 +109,7 @@
                     <div class="item-inner">
                       <div class="item-title item-label">Address</div>
                       <div class="item-input-wrap">
-                        <input type="text" placeholder="First name"/>
+                        <input type="text" id="address" placeholder="Address"/>
                       </div>
                     </div>
                   </div>
@@ -119,15 +119,18 @@
                       <div class="item-inner">
                         <div class="item-title item-label">Phone Number</div>
                         <div class="item-input-wrap">
-                          <input type="text" placeholder="First name"/>
+                          <input type="text" id="phone" placeholder="Phone number" />
                         </div>
                       </div>
                     </div>
                   </li>
       </ul>
+        <p class="row">
+          <a href="#" id="register" class="col button button-big button-fill button-raised color-green">Register</a>
+        </p>
     </div>
-      <p class="row">
-        <a href="#" id="register" class="col button button-big button-fill button-raised color-green">Register</a>
+      <p id="feedback" class="row">
+        Registration successful.<br /><a href="/">Back to login screen.</a>
       </p>
     </div>
   </div>

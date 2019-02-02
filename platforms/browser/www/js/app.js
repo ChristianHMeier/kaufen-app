@@ -87,9 +87,13 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
     $$('#feedback').hide();
     $$('#upload').on('click', function()
     {
+      /*if (document.getElementById("imageFile").files.length > 0)
+      {
+        alert('No file selected');
+      }*/
         var dataPost = {
           "categoryId": $$('#category').val(),
-          "categoryName": $$('#category').val(),
+          //"categoryName": $$('#category').val(),
           "depth": $$('#depth').val(),
           "description": $$('#description').val(),
           "height": $$('#height').val(),
@@ -105,17 +109,20 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           "type": $$('#type').val(),
           "weight": $$('#weight').val()
         };
-        alert(JSON.stringify(dataPost));
+        var formData = new FormData();
+        formData.append("product", JSON.stringify(dataPost));
+        formData.append("file",  document.getElementById("imageFile").files[0]);//fileData);
+        //alert(JSON.stringify(dataPost));
         app.request({
           url: 'http://35.200.224.144:8090/api/v1/product',
           headers: {Authorization: "Bearer "+securityToken},
           method: 'POST',
-          contentType: 'application/json',
+          contentType: 'multipart/form-data',
           dataType: 'json',
-          data: '{"product":'+JSON.stringify(dataPost)+'}',
+          data: formData,
           success: function (data, status, xhr) {
           //alert(JSON.stringify(data));
-            $$('#userForm').hide();
+            $$('#productForm').hide();
             $$('#feedback').show();
         }});
       });
