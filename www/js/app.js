@@ -34,6 +34,7 @@ var mainView = app.views.create('.view-main', {
 var userId;
 var securityToken;
 var hashed;
+var cart = [];
 
 loginStart();
 $$(document).on('page:init', '.page[data-name="home"]', function (e)
@@ -126,6 +127,78 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
             $$('#feedback').show();
         }});
       });
+});
+$$(document).on('page:init', '.page[data-name="browse"]', function (e)
+{
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/categories/count',
+      method: 'GET',
+      dataType: 'json',
+      success: function (data, status, xhr) {
+      //alert(JSON.stringify(data));
+      for (var i = 0; i < data.data.length; i++)
+      {
+        $$('#categoryContent').append($$('<div>').addClass('block')
+          .append($$('<div>').addClass('row')
+            .append($$('<div>').addClass('col-100')
+              .append($$('<a>').addClass('button button-raised button-fill').attr({
+                                    'href': '/products/'+data.data[i].categoryId+'/',
+                                    'text': data.data[i].categoryName+' ('+data.data[i].categoryCount+')'
+                                  })
+                    )
+                  )
+                )
+              );
+      }
+    }});
+});
+$$(document).on('page:init', '.page[data-name="products"]', function (e)
+{
+  if ($$('#categoryId').val() === '0')
+  {
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/product',
+      method: 'GET',
+      dataType: 'json',
+      success: function (data, status, xhr) {
+      //alert(JSON.stringify(data));
+      for (var i = 0; i < data.data.length; i++)
+      {
+        $$('#productContent').append($$('<div>').addClass('col-50')
+              .append($$('<a>').attr({
+                                    'href': '/product/'+data.data[i].id+'/',
+                                    'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                  })
+                )
+              );
+      }
+    }});
+  }
+  else
+  {
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/product/filter',
+      method: 'GET',
+      data: {
+        category: $$('#categoryId').val(),
+        order: 'asc',
+        sortBy: 'productName'
+      },
+      dataType: 'json',
+      success: function (data, status, xhr) {
+      //alert(JSON.stringify(data));
+      for (var i = 0; i < data.data.length; i++)
+      {
+        $$('#productContent').append($$('<div>').addClass('col-50')
+              .append($$('<a>').attr({
+                                    'href': '/product/'+data.data[i].id+'/',
+                                    'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                  })
+                )
+              );
+      }
+    }});
+  }
 });
 $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
 {

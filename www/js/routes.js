@@ -28,9 +28,13 @@ routes = [
     url: './pages/new-user.html',
   },
   {
-    path: '/update/:id/',
-    //url: './pages/update.html',
-    template: `<div class="page" data-name="update">
+    path: '/browse/',
+    url: './pages/browse.html',
+  },
+  {
+    path: '/products/:id/',
+    //url: './pages/products.html',
+    template: `<div class="page" data-name="products">
       <div class="navbar">
         <div class="navbar-inner sliding">
           <div class="left">
@@ -39,30 +43,16 @@ routes = [
               <span class="ios-only">Back</span>
             </a>
           </div>
-          <div class="title">Update Order Status</div>
+          <div class="title">Products</div>
         </div>
       </div>
       <div class="page-content">
-        <div class="list no-hairlines-md">
-          <ul>
-            <li>
-              <div class="item-content item-input">
-                <div class="item-inner">
-                  <div class="item-title item-label">Select the new status:</div>
-                  <div class="item-input-wrap">
-                    <select id="updateStatusSelect">
-                      <option value="3">Shipped</option>
-                      <option value="6">Refunded</option>
-                      <option value="7">Canceled</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </li>
-          </ul>
+        <input type="hidden" value="{{$route.params.id}}" id="categoryId" />
+        <div class="block-title">Select a Product</div>
+        <div class="block"> <!--block-strong-->
+          <div id="productContent" class="row">
+          </div>
         </div>
-        <input type="hidden" id="updateOrderId" value="{{$route.params.id}} />
-        <a href="#" id="updateStatusSubmit" class="col button button-big button-fill button-raised color-green">Update Order</a>
       </div>
     </div>`
   },
