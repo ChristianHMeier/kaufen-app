@@ -28,6 +28,14 @@ routes = [
     url: './pages/new-user.html',
   },
   {
+    path: '/my-account/',
+    url: './pages/my-account.html',
+  },
+  {
+    path: '/my-products/',
+    url: './pages/my-products.html',
+  },
+  {
     path: '/browse/',
     url: './pages/browse.html',
   },
@@ -51,6 +59,34 @@ routes = [
         <div class="block-title">Select a Product</div>
         <div class="block"> <!--block-strong-->
           <div id="productContent" class="row">
+          </div>
+        </div>
+      </div>
+    </div>`
+  },
+  {
+    path: '/product/:id/',
+    //url: './pages/products.html',
+    template: `<div class="page" data-name="product">
+      <div class="navbar">
+        <div class="navbar-inner sliding">
+          <div class="left">
+            <a href="#" class="link back">
+              <i class="icon icon-back"></i>
+              <span class="ios-only">Back</span>
+            </a>
+          </div>
+          <div class="title">Product Details</div>
+        </div>
+      </div>
+      <div class="page-content">
+        <input type="hidden" value="{{$route.params.id}}" id="productId" />
+        <input type="hidden" id="productData" />
+        <div class="block-title">Product Details</div>
+        <div class="block"> <!--block-strong-->
+          <div id="productContent" class="row">
+            <div class="col-50"><img id="productImage" /></div>
+            <div class="col-50" id="productDetails"></div>
           </div>
         </div>
       </div>

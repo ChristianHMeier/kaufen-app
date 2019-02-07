@@ -1,1 +1,13 @@
 /* Your app styles here */
+.product-list-item
+{
+  text-align: center;
+}
+.product-list-item a img, #productImage
+{
+  display: block;
+  max-width: 90%;
+  height: auto;
+  margin-left: auto;
+  margin-left: auto;
+}

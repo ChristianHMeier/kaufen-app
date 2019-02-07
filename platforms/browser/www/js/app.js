@@ -154,51 +154,132 @@ $$(document).on('page:init', '.page[data-name="browse"]', function (e)
 });
 $$(document).on('page:init', '.page[data-name="products"]', function (e)
 {
+  var ajaxUrl = ''
+  var dataBody = {};
   if ($$('#categoryId').val() === '0')
   {
-    app.request({
-      url: 'http://35.200.224.144:8090/api/v1/product',
-      method: 'GET',
-      dataType: 'json',
-      success: function (data, status, xhr) {
-      //alert(JSON.stringify(data));
-      for (var i = 0; i < data.data.length; i++)
-      {
-        $$('#productContent').append($$('<div>').addClass('col-50')
-              .append($$('<a>').attr({
-                                    'href': '/product/'+data.data[i].id+'/',
-                                    'text': data.data[i].productName+' ('+data.data[i].stock+')'
-                                  })
-                )
-              );
-      }
-    }});
+    ajaxUrl +=  'http://35.200.224.144:8090/api/v1/product';
   }
   else
   {
-    app.request({
-      url: 'http://35.200.224.144:8090/api/v1/product/filter',
-      method: 'GET',
-      data: {
-        category: $$('#categoryId').val(),
-        order: 'asc',
-        sortBy: 'productName'
-      },
-      dataType: 'json',
-      success: function (data, status, xhr) {
-      //alert(JSON.stringify(data));
+    ajaxUrl +=  'http://35.200.224.144:8090/api/v1/product/filter';
+    dataBody['category'] = $$('#categoryId').val();
+    dataBody['sortBy'] = 'name';
+    dataBody['order'] = 'ASC';
+
+  }
+
+  app.request({
+    url: ajaxUrl,
+    method: 'GET',
+    dataType: 'json',
+    data: dataBody,
+    success: function (data, status, xhr) {
+    //alert(JSON.stringify(data));
+    for (var i = 0; i < data.data.length; i++)
+    {
+      $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
+            .append($$('<a>').attr({
+                                  'href': '/product/'+data.data[i].id+'/',
+                                  'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                })
+                  .append($$('<img>').attr({
+                                        'src': data.data[i].imgPath,
+                                        'alt': data.data[i].productName,
+                                        'title': data.data[i].productName
+                                    }))
+                  .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
+              )
+            );
+    }
+  }});
+});
+$$(document).on('page:init', '.page[data-name="history"]', function (e)
+{
+
+  app.request({
+    url: 'http://35.200.224.144:8090/api/v1/product/bought/'+userId,
+    method: 'GET',
+    headers: {Authorization: "Bearer "+securityToken},
+    dataType: 'json',
+    success: function (data, status, xhr) {
+    //alert(JSON.stringify(data));
+    if (data.data.length === 0)
+    {
+      $$('#productContent').append($$('<div>').addClass('col-50').html('You have not purchased anything yet.'));
+    }
+    else
+    {
       for (var i = 0; i < data.data.length; i++)
       {
-        $$('#productContent').append($$('<div>').addClass('col-50')
+        $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
               .append($$('<a>').attr({
                                     'href': '/product/'+data.data[i].id+'/',
                                     'text': data.data[i].productName+' ('+data.data[i].stock+')'
                                   })
+                    .append($$('<img>').attr({
+                                          'src': data.data[i].imgPath,
+                                          'alt': data.data[i].productName,
+                                          'title': data.data[i].productName
+                                      }))
+                    .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
                 )
               );
       }
+    }
+  }});
+});
+  $$(document).on('page:init', '.page[data-name="my-products"]', function (e)
+  {
+
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/product/seller/'+userId,
+      method: 'GET',
+      headers: {Authorization: "Bearer "+securityToken},
+      dataType: 'json',
+      success: function (data, status, xhr) {
+      //alert(JSON.stringify(data));
+      if (data.data.length === 0)
+      {
+        $$('#productContent').append($$('<div>').addClass('col-50').html('You have not published anything yet.'));
+      }
+      else
+      {
+        for (var i = 0; i < data.data.length; i++)
+        {
+          $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
+                .append($$('<a>').attr({
+                                      'href': '/product/'+data.data[i].id+'/',
+                                      'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                    })
+                      .append($$('<img>').attr({
+                                            'src': data.data[i].imgPath,
+                                            'alt': data.data[i].productName,
+                                            'title': data.data[i].productName
+                                        }))
+                      .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
+                  )
+                );
+        }
+      }
     }});
-  }
+});
+$$(document).on('page:init', '.page[data-name="product"]', function (e)
+{
+  app.request({
+    url: 'http://35.200.224.144:8090/api/v1/product/'+$$('#productId').val(),
+    method: 'GET',
+    dataType: 'json',
+    success: function (data, status, xhr) {
+    //alert(JSON.stringify(data));
+    $$('#productData').val(JSON.stringify(data.data));
+    $$('#productImage').attr('src', data.data.imgPath);
+    var details = 'Name: '+data.data.productName+'<br />';
+    details += 'Price: '+data.data.price+'<br />';
+    details += 'Category: '+data.data.categoryName+'<br />';
+    details += 'Stock: '+data.data.stock+'<br />';
+    $$('#productDetails').html(details);
+  }});
 });
 $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
 {
@@ -207,6 +288,34 @@ $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
   {
       var salt = gensalt(12);
       hashpw($$('#pass').val(), salt, hashing);
+  });
+});
+$$(document).on('page:init', '.page[data-name="my-account"]', function (e)
+{
+  $$('#feedback').hide();
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/user/',
+      method: 'GET',
+      headers: {Authorization: "Bearer "+securityToken},
+      data: {userId: userId},
+      dataType: 'json',
+      success: function (data, status, xhr) {
+      //alert(JSON.stringify(data));
+      $$('#firstName').val(data.data.firstName);
+      $$('#surname').val(data.data.surname);
+      $$('#alias').val(data.data.alias);
+      $$('#email').val(data.data.email);
+      $$('#country').val(data.data.country);
+      $$('#state').val(data.data.state);
+      $$('#city').val(data.data.city);
+      $$('#postCode').val(data.data.postCode);
+      $$('#address').val(data.data.address);
+      $$('#phone').val(data.data.phone);
+    }});
+  $$('#register').on('click', function()
+  {
+      var salt = gensalt(12);
+      hashpw($$('#pass').val(), salt, updating);
   });
 });
 function hashing(hash)
@@ -237,6 +346,41 @@ function hashing(hash)
     contentType: 'application/json',//'multipart/form-data',
     dataType: 'json',
     data: JSON.stringify(dataPost),
+    success: function (data, status, xhr) {
+    //alert(JSON.stringify(data));
+      $$('#userForm').hide();
+      $$('#feedback').show();
+  }});
+}
+function updating(hash)
+{
+  //alert('Hash is '+hash);
+  //hashed = hash;
+
+  var dataPut = {
+    "address": $$('#address').val(),
+    "alias": $$('#alias').val(),
+    /*"authorities": {
+      "authority": "ROLE_USER"
+    },*/
+    "city": $$('#city').val(),
+    "country": $$('#country').val(),
+    "emailId": $$('#email').val(),
+    "firstName": $$('#firstName').val(),
+    "lastName": $$('#surname').val(),
+    "password": hash,
+    "phoneNo": $$('#phone').val().replace(' ', ''),
+    "postCode": $$('#postCode').val(),
+    "role": "ROLE_USER",
+    "state": $$('#state').val(),
+    "token": securityToken
+  };
+  app.request({
+    url: 'http://35.200.224.144:8090/api/v1/user',
+    method: 'PUT',
+    contentType: 'application/json',//'multipart/form-data',
+    dataType: 'json',
+    data: JSON.stringify(dataPut),
     success: function (data, status, xhr) {
     //alert(JSON.stringify(data));
       $$('#userForm').hide();
