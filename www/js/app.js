@@ -31,7 +31,7 @@ var mainView = app.views.create('.view-main', {
   url: '/'
 });
 
-var userId;
+var user;//Id;
 var securityToken;
 var hashed;
 var cart = [];
@@ -43,10 +43,11 @@ $$(document).on('page:init', '.page[data-name="home"]', function (e)
 });
 $$(document).on('page:init', '.page[data-name="dashboard"]', function (e)
 {
-  //alert(userId);
+  $$('#name').html(user.firstName);
+  //alert(user.id);
   //alert(securityToken);
-  $$("#testLink").on('click', function()
-  {
+//  $$("#testLink").on('click', function()
+  //{
     //app.dialog.alert('JS Dialog Alert works.','Notice');
     /*var dialog =*/ //{//create({
       /*text:*/
@@ -62,7 +63,7 @@ $$(document).on('page:init', '.page[data-name="dashboard"]', function (e)
     //dialog.open();
     //var test = app.dialog.get(el);
     //test.open();*/
-  });
+  //});
 });
 $$(document).on('page:init', '.page[data-name="update"]', function (e)
 {
@@ -104,7 +105,7 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           "prodCondition": $$('#prodCondition').val(),
           "productName": $$('#name').val(),
           "publicationDate": new Date().toISOString().slice(0, 28),//19).replace('T', ' '),
-          "sellerId":userId,
+          "sellerId":user.id,
           "slug": $$('#name').val().toLowerCase().replace(' ', '-'),
           "stock": $$('#stock').val(),
           "type": $$('#type').val(),
@@ -130,6 +131,8 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
 });
 $$(document).on('page:init', '.page[data-name="browse"]', function (e)
 {
+    $$('#preloaderText').html('Loading Categories...');
+    app.preloader.show();
     app.request({
       url: 'http://35.200.224.144:8090/api/v1/categories/count',
       method: 'GET',
@@ -150,6 +153,7 @@ $$(document).on('page:init', '.page[data-name="browse"]', function (e)
                 )
               );
       }
+      app.preloader.hide();
     }});
 });
 $$(document).on('page:init', '.page[data-name="products"]', function (e)
@@ -169,6 +173,8 @@ $$(document).on('page:init', '.page[data-name="products"]', function (e)
 
   }
 
+  $$('#preloaderText').html('Loading Products...');
+  app.preloader.show();
   app.request({
     url: ajaxUrl,
     method: 'GET',
@@ -180,25 +186,28 @@ $$(document).on('page:init', '.page[data-name="products"]', function (e)
     {
       $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
             .append($$('<a>').attr({
-                                  'href': '/product/'+data.data[i].id+'/',
-                                  'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                  'href': '/product/'+data.data[i].id+'/'//,
+                                  //'text': data.data[i].productName+' ('+data.data[i].stock+')'
                                 })
                   .append($$('<img>').attr({
                                         'src': data.data[i].imgPath,
                                         'alt': data.data[i].productName,
                                         'title': data.data[i].productName
                                     }))
-                  .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
+                  .append($$('<p>').html(data.data[i].productName+' ('+data.data[i].stock+')'))
               )
             );
     }
+    app.preloader.hide();
   }});
 });
 $$(document).on('page:init', '.page[data-name="history"]', function (e)
 {
 
+  $$('#preloaderText').html('Loading Bought Products...');
+  app.preloader.show();
   app.request({
-    url: 'http://35.200.224.144:8090/api/v1/product/bought/'+userId,
+    url: 'http://35.200.224.144:8090/api/v1/product/bought/'+user.id,
     method: 'GET',
     headers: {Authorization: "Bearer "+securityToken},
     dataType: 'json',
@@ -226,14 +235,17 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
                 )
               );
       }
+      app.preloader.hide();
     }
   }});
 });
   $$(document).on('page:init', '.page[data-name="my-products"]', function (e)
   {
 
+    $$('#preloaderText').html('Loading Your Products...');
+    app.preloader.show();
     app.request({
-      url: 'http://35.200.224.144:8090/api/v1/product/seller/'+userId,
+      url: 'http://35.200.224.144:8090/api/v1/product/seller/'+user.id,
       method: 'GET',
       headers: {Authorization: "Bearer "+securityToken},
       dataType: 'json',
@@ -261,11 +273,14 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
                   )
                 );
         }
+        app.preloader.hide();
       }
     }});
 });
 $$(document).on('page:init', '.page[data-name="product"]', function (e)
 {
+  $$('#preloaderText').html('Loading Product Data...');
+  app.preloader.show();
   app.request({
     url: 'http://35.200.224.144:8090/api/v1/product/'+$$('#productId').val(),
     method: 'GET',
@@ -279,6 +294,7 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
     details += 'Category: '+data.data.categoryName+'<br />';
     details += 'Stock: '+data.data.stock+'<br />';
     $$('#productDetails').html(details);
+    app.preloader.hide();
   }});
 });
 $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
@@ -292,26 +308,26 @@ $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
 });
 $$(document).on('page:init', '.page[data-name="my-account"]', function (e)
 {
-  $$('#feedback').hide();
+  /*$$('#feedback').hide();
     app.request({
       url: 'http://35.200.224.144:8090/api/v1/user/',
       method: 'GET',
       headers: {Authorization: "Bearer "+securityToken},
-      data: {userId: userId},
+      data: {user.id: user.id},
       dataType: 'json',
-      success: function (data, status, xhr) {
+      success: function (data, status, xhr) {*/
       //alert(JSON.stringify(data));
-      $$('#firstName').val(data.data.firstName);
-      $$('#surname').val(data.data.surname);
-      $$('#alias').val(data.data.alias);
-      $$('#email').val(data.data.email);
-      $$('#country').val(data.data.country);
-      $$('#state').val(data.data.state);
-      $$('#city').val(data.data.city);
-      $$('#postCode').val(data.data.postCode);
-      $$('#address').val(data.data.address);
-      $$('#phone').val(data.data.phone);
-    }});
+      $$('#firstName').val(user.firstName);
+      $$('#surname').val(user.lastName);
+      $$('#alias').val(user.alias);
+      $$('#email').val(user.emailId);
+      $$('#country').val(user.country);
+      $$('#state').val(user.state);
+      $$('#city').val(user.city);
+      $$('#postCode').val(user.postCode);
+      $$('#address').val(user.address);
+      $$('#phone').val(user.phoneNo);
+  //});
   $$('#register').on('click', function()
   {
       var salt = gensalt(12);
@@ -340,6 +356,8 @@ function hashing(hash)
     "role": "ROLE_USER",
     "state": $$('#state').val()
   };
+  $$('#preloaderText').html('Creating your user account...');
+  app.preloader.show();
   app.request({
     url: 'http://35.200.224.144:8090/api/v1/user',
     method: 'POST',
@@ -350,6 +368,7 @@ function hashing(hash)
     //alert(JSON.stringify(data));
       $$('#userForm').hide();
       $$('#feedback').show();
+      app.preloader.hide();
   }});
 }
 function updating(hash)
@@ -375,6 +394,8 @@ function updating(hash)
     "state": $$('#state').val(),
     "token": securityToken
   };
+  $$('#preloaderText').html('Updating your account...');
+  app.preloader.show();
   app.request({
     url: 'http://35.200.224.144:8090/api/v1/user',
     method: 'PUT',
@@ -385,6 +406,7 @@ function updating(hash)
     //alert(JSON.stringify(data));
       $$('#userForm').hide();
       $$('#feedback').show();
+      app.preloader.hide();
   }});
 }
 function loginStart()
@@ -410,7 +432,7 @@ function loginStart()
       //console.log(status);
       //console.log(xhr.getResponseHeader('authorization'));
       //console.log(xhr.getResponseHeader('pragma'));
-      userId = data.user.id;
+      user = data.user;
       securityToken = data.user.token;
       $$('#my-login-screen [name="username"]').val('');
       $$('#my-login-screen [name="password"]').val('');
