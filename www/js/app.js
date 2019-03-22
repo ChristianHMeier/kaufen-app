@@ -36,7 +36,7 @@ var securityToken;
 var hashed;
 var cart = [];
 
-loginStart();
+//loginStart();
 $$(document).on('page:init', '.page[data-name="home"]', function (e)
 {
   loginStart();
@@ -103,10 +103,10 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           "length": $$('#length').val(),
           "price": $$('#price').val(),
           "prodCondition": $$('#prodCondition').val(),
-          "productName": $$('#name').val(),
+          "productName": $$('#productName').val(),
           "publicationDate": new Date().toISOString().slice(0, 28),//19).replace('T', ' '),
           "sellerId":user.id,
-          "slug": $$('#name').val().toLowerCase().replace(' ', '-'),
+          "slug": $$('#productName').val().toLowerCase().replace(' ', '-'),
           "stock": $$('#stock').val(),
           "type": $$('#type').val(),
           "weight": $$('#weight').val()
@@ -286,7 +286,6 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
     method: 'GET',
     dataType: 'json',
     success: function (data, status, xhr) {
-    //alert(JSON.stringify(data));
     $$('#productData').val(JSON.stringify(data.data));
     $$('#productImage').attr('src', data.data.imgPath);
     var details = 'Name: '+data.data.productName+'<br />';
@@ -294,14 +293,51 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
     details += 'Category: '+data.data.categoryName+'<br />';
     details += 'Stock: '+data.data.stock+'<br />';
     $$('#productDetails').html(details);
+    if (data.data.stock > 0)
+    {
+      if (productInCart(parseInt($$('#productId').val())))
+      {
+        $$('#cartButton').html('Remove from Cart');
+      }
+      $$('#cartButton').on('click', function()
+      {
+        let inCart = productInCart(parseInt($$('#productId').val()));
+        if (!inCart)
+        {
+          var product = JSON.parse($$('#productData').val());
+          //Add the buyer id so it can be used in the later POST request
+          product.buyerId = user.id;
+          cart.push(product);
+          $$('#cartButton').html('Remove from Cart');
+        }
+        else
+        {
+          for (var i = 0; i < cart.length; i++)
+          {
+            if (cart[i].id === parseInt($$('#productId').val()))
+            {
+              cart.splice(i, 1);
+              break;
+            }
+          }
+          $$('#cartButton').html('Add to Cart');
+        }
+      });
+    }
+    else
+    {
+      $$('#cartButton').attr('disabled', 'disabled').html('Out of Stock');
+    }
     app.preloader.hide();
   }});
+
 });
 $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
 {
   $$('#feedback').hide();
   $$('#register').on('click', function()
   {
+      app.preloader.show();
       var salt = gensalt(12);
       hashpw($$('#pass').val(), salt, hashing);
   });
@@ -327,6 +363,7 @@ $$(document).on('page:init', '.page[data-name="my-account"]', function (e)
       $$('#postCode').val(user.postCode);
       $$('#address').val(user.address);
       $$('#phone').val(user.phoneNo);
+      $$('#feedback').hide();
   //});
   $$('#register').on('click', function()
   {
@@ -334,6 +371,21 @@ $$(document).on('page:init', '.page[data-name="my-account"]', function (e)
       hashpw($$('#pass').val(), salt, updating);
   });
 });
+
+function productInCart(id)
+{
+    let inCart = false;
+    for (var i = 0; i < cart.length; i++)
+    {
+      if (cart[i].id === id)
+      {
+        inCart = true;
+        break;
+      }
+    }
+    return inCart;
+}
+
 function hashing(hash)
 {
   //alert('Hash is '+hash);
@@ -357,7 +409,7 @@ function hashing(hash)
     "state": $$('#state').val()
   };
   $$('#preloaderText').html('Creating your user account...');
-  app.preloader.show();
+  //app.preloader.show();
   app.request({
     url: 'http://35.200.224.144:8090/api/v1/user',
     method: 'POST',
@@ -382,6 +434,7 @@ function updating(hash)
     /*"authorities": {
       "authority": "ROLE_USER"
     },*/
+    "id": user.id,
     "city": $$('#city').val(),
     "country": $$('#country').val(),
     "emailId": $$('#email').val(),
@@ -394,20 +447,34 @@ function updating(hash)
     "state": $$('#state').val(),
     "token": securityToken
   };
+
   $$('#preloaderText').html('Updating your account...');
   app.preloader.show();
+
   app.request({
-    url: 'http://35.200.224.144:8090/api/v1/user',
+    url: 'http://35.200.224.144:8090/api/v1/user/'+user.id,
     method: 'PUT',
-    contentType: 'application/json',//'multipart/form-data',
+    headers: {
+              Authorization: "Bearer "+securityToken
+            },
+    contentType: 'application/json',
     dataType: 'json',
     data: JSON.stringify(dataPut),
-    success: function (data, status, xhr) {
-    //alert(JSON.stringify(data));
+    success: function (data, status, xhr)
+    {
       $$('#userForm').hide();
       $$('#feedback').show();
+      user = data.data;
+      //security step
+      user.password = '';
       app.preloader.hide();
-  }});
+  },
+  error:	function (xhr, status)
+  {
+    console.log(xhr);
+    console.log(status);
+  }
+});
 }
 function loginStart()
 {
@@ -416,28 +483,23 @@ function loginStart()
     var username = $$('#my-login-screen [name="username"]').val();
     var password = $$('#my-login-screen [name="password"]').val();
 
-    //$$("#dashboardLink").click();
-
-    /*var mainView = app.views.create('.view-main', {
-      url: '/dashboard/'
-    });*/
     app.request({
       url: 'http://35.200.224.144:8090/api/v1/login',
-      //headers: {Authorization: "Bearer "},
       method: 'POST',
       dataType: 'json',
       data: {emailId: username, password: password},
       success: function (data, status, xhr) {
-      //console.log(data);
-      //console.log(status);
-      //console.log(xhr.getResponseHeader('authorization'));
-      //console.log(xhr.getResponseHeader('pragma'));
       user = data.user;
       securityToken = data.user.token;
       $$('#my-login-screen [name="username"]').val('');
       $$('#my-login-screen [name="password"]').val('');
       $$("#dashboardLink").click();
-    }});
+    },
+    error: function (xhr, status)
+    {
+      console.log(xhr);
+    }
+  });
   //var mainView = app.addView('.view-main')
 
   // Load page from about.html file to main View:

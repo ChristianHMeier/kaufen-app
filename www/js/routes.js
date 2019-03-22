@@ -40,6 +40,10 @@ routes = [
     url: './pages/browse.html',
   },
   {
+    path: '/checkout/',
+    url: './pages/checkout.html',
+  },
+  {
     path: '/products/:id/',
     //url: './pages/products.html',
     template: `<div class="page" data-name="products">
@@ -87,6 +91,7 @@ routes = [
             <div class="col-50">
               <img id="productImage" />
               <a href="#" id="cartButton" class="col button button-big button-fill button-raised color-green">Add to Cart</a>
+              <a href="/checkout/" class="col button button-big button-fill button-raised color-red">Go to Checkout</a>
             </div>
             <div class="col-50" id="productDetails"></div>
           </div>

@@ -66,7 +66,6 @@ routes = [
   },
   {
     path: '/product/:id/',
-    //url: './pages/products.html',
     template: `<div class="page" data-name="product">
       <div class="navbar">
         <div class="navbar-inner sliding">
@@ -85,7 +84,10 @@ routes = [
         <div class="block-title">Product Details</div>
         <div class="block"> <!--block-strong-->
           <div id="productContent" class="row">
-            <div class="col-50"><img id="productImage" /></div>
+            <div class="col-50">
+              <img id="productImage" />
+              <a href="#" id="cartButton" class="col button button-big button-fill button-raised color-green">Add to Cart</a>
+            </div>
             <div class="col-50" id="productDetails"></div>
           </div>
         </div>

@@ -40,6 +40,10 @@ routes = [
     url: './pages/browse.html',
   },
   {
+    path: '/checkout/',
+    url: './pages/checkout.html',
+  },
+  {
     path: '/products/:id/',
     //url: './pages/products.html',
     template: `<div class="page" data-name="products">
