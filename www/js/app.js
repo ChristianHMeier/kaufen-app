@@ -370,8 +370,78 @@ $$(document).on('page:init', '.page[data-name="my-account"]', function (e)
       var salt = gensalt(12);
       hashpw($$('#pass').val(), salt, updating);
   });
+
+});
+$$(document).on('page:init', '.page[data-name="checkout"]', function (e)
+{
+  for (var i = 0; i < cart.length; i++)
+  {
+    $$('#cartTable').append($$('<div>').addClass('row').addClass('cartRow')
+      .append($$('<div>').addClass('col-5')
+        .append($$('<img>').attr({'alt': cart[i].productName, 'title': cart[i].productName, 'src': cart[i].imgPath}))
+      )
+      .append($$('<div>').addClass('col-60')
+        .append($$('<span>').html(cart[i].productName))
+      )
+      .append($$('<div>').addClass('col-20').html(cart[i].price.toString().replace('.', ',')+' €'))
+      .append($$('<div>').addClass('col-15')
+        .append($$('<input>')
+          .attr({'type': 'button', 'value': 'X', 'data-id': cart[i].id, 'data-index': i})
+          .on('click', function()
+          {
+            cart.splice(parseInt($$(this).attr('data-index')), 1);
+            $$(this).parent().parent().remove();
+            checkTable();
+          })
+        )
+      )
+    );
+  }
+  $$('#orderButton').on('click', function()
+  {
+    $$('#preloaderText').html('Submitting order...');
+    //app.preloader.show();
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/product/buy',
+      method: 'POST',
+      headers: {
+                Authorization: "Bearer "+securityToken
+              },
+      contentType: 'application/json',//'multipart/form-data',
+      dataType: 'json',
+      data: JSON.stringify(cart),
+      success: function (data, status, xhr) {
+        cart = [];
+        $$('.cartRow').remove();
+        checkTable();
+        $$('#cartTable, #totalRow').hide();
+        //$$('#orderButton').parent().hide();
+        $$('#feedback').html(data.message).show();
+        app.preloader.hide();
+    }});
+  });
+  checkTable();
 });
 
+function checkTable()
+{
+  var total = 0;
+  if (cart.length === 0)
+  {
+    $$('#orderButton')
+      .attr({'href': '/dashboard/'})
+      .off('click')
+      .html('Your cart is empty, come back later');
+  }
+  else
+  {
+      for (var i = 0; i < cart.length; i++)
+      {
+        total += cart[i].price;
+      }
+  }
+  $$('#cartTotal').html(total.toFixed(2).toString().replace('.', ','));
+}
 function productInCart(id)
 {
     let inCart = false;

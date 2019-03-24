@@ -10,7 +10,7 @@
       <div class="title">Checkout</div>
     </div>
   </div>
-  <div id="categoryContent" class="page-content">
+  <div id="checkoutContent" class="page-content">
     <div class="block-title">Your Cart</div>
     <div id="cartTable" class="block block-strong">
       <div class="row">
@@ -20,12 +20,13 @@
       </div>
     </div>
     <div class="block block-strong">
+      <div class="row" id="totalRow">
+        <p class="col-100">Total: <span id="cartTotal"></span> €</p>
+      </div>
       <p class="row">
-        Total: 
+        <a href="#" id="orderButton" class="col button button-big button-fill button-raised color-green">Order</a>
       </p>
-      <p class="row">
-        <a href="#" class="col button button-big button-fill button-raised color-green">Order</a>
-      </p>
+      <p id="feedback" class="row"></p>
     </div>
   </div>
 </div>
