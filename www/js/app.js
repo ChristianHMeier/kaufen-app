@@ -33,8 +33,9 @@ var mainView = app.views.create('.view-main', {
 
 var user;//Id;
 var securityToken;
-var hashed;
+//var hashed;
 var cart = [];
+var searchText = '';
 
 //loginStart();
 $$(document).on('page:init', '.page[data-name="home"]', function (e)
@@ -141,20 +142,31 @@ $$(document).on('page:init', '.page[data-name="browse"]', function (e)
       //alert(JSON.stringify(data));
       for (var i = 0; i < data.data.length; i++)
       {
-        $$('#categoryContent').append($$('<div>').addClass('block')
-          .append($$('<div>').addClass('row')
-            .append($$('<div>').addClass('col-100')
-              .append($$('<a>').addClass('button button-raised button-fill').attr({
+        $$('#categoryBlock').append($$('<div>').addClass('row')
+          .append($$('<div>').addClass('col-100')
+            .append($$('<a>').addClass('button button-raised button-fill').attr({
                                     'href': '/products/'+data.data[i].categoryId+'/',
                                     'text': data.data[i].categoryName+' ('+data.data[i].categoryCount+')'
                                   })
-                    )
-                  )
                 )
-              );
+              )
+            );
       }
       app.preloader.hide();
     }});
+    if (searchText !== '')
+    {
+      searchProducts();
+    }
+    $$('#searchText').on('keyUp', function() {searchText = $$('#searchText').val();});
+    $$('#searchButton').on('click', function()
+    {
+      $$('#searchText').val($$('#searchText').val().trim());
+      if ($$('#searchText').val() !== '')
+      {
+        searchProducts();
+      }
+    });
 });
 $$(document).on('page:init', '.page[data-name="products"]', function (e)
 {
@@ -221,19 +233,17 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
     {
       for (var i = 0; i < data.data.length; i++)
       {
-        $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
+        $$('#productContent')
+          .append($$('<div>').addClass('col-20 product-list-item').html(data.data[i].purchaseId))
+          .append($$('<div>').addClass('col-30 product-list-item')
               .append($$('<a>').attr({
-                                    'href': '/product/'+data.data[i].id+'/',
-                                    'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                    'href': '/product/'+data.data[i].productId+'/',
+                                    'text': data.data[i].productName
                                   })
-                    .append($$('<img>').attr({
-                                          'src': data.data[i].imgPath,
-                                          'alt': data.data[i].productName,
-                                          'title': data.data[i].productName
-                                      }))
-                    .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
                 )
-              );
+          )
+          .append($$('<div>').addClass('col-20 product-list-item').html(data.data[i].price.toFixed(2).replace('.', ',')+' €'))
+          .append($$('<div>').addClass('col-30 product-list-item').html(data.data[i].purchaseDate.replace('T', ' ').slice(0, 19)));
       }
       app.preloader.hide();
     }
@@ -245,36 +255,43 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
     $$('#preloaderText').html('Loading Your Products...');
     app.preloader.show();
     app.request({
-      url: 'http://35.200.224.144:8090/api/v1/product/seller/'+user.id,
+      url: 'http://35.200.224.144:8090/api/v1/product/',//seller/'+user.id,
       method: 'GET',
       headers: {Authorization: "Bearer "+securityToken},
       dataType: 'json',
       success: function (data, status, xhr) {
-      //alert(JSON.stringify(data));
-      if (data.data.length === 0)
+      var myProducts = [];
+      for (var i = 0; i < data.data.length; i++)
+      {
+        if (data.data[i].sellerId === user.id)
+        {
+          myProducts.push(data.data[i]);
+        }
+      }
+      if (myProducts.length === 0)
       {
         $$('#productContent').append($$('<div>').addClass('col-50').html('You have not published anything yet.'));
       }
       else
       {
-        for (var i = 0; i < data.data.length; i++)
+        for (var i = 0; i < myProducts.length; i++)
         {
           $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
                 .append($$('<a>').attr({
-                                      'href': '/product/'+data.data[i].id+'/',
-                                      'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                      'href': '/product/'+myProducts[i].id+'/',
+                                      'text': myProducts[i].productName+' ('+myProducts[i].stock+')'
                                     })
                       .append($$('<img>').attr({
-                                            'src': data.data[i].imgPath,
-                                            'alt': data.data[i].productName,
-                                            'title': data.data[i].productName
+                                            'src': myProducts[i].imgPath,
+                                            'alt': myProducts[i].productName,
+                                            'title': myProducts[i].productName
                                         }))
-                      .append($$('<p>').attr({'text': data.data[i].productName+' ('+data.data[i].stock+')'}))
+                      .append($$('<p>').attr({'text': myProducts[i].productName+' ('+myProducts[i].stock+')'}))
                   )
                 );
         }
-        app.preloader.hide();
       }
+      app.preloader.hide();
     }});
 });
 $$(document).on('page:init', '.page[data-name="product"]', function (e)
@@ -293,7 +310,7 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
     details += 'Category: '+data.data.categoryName+'<br />';
     details += 'Stock: '+data.data.stock+'<br />';
     $$('#productDetails').html(details);
-    if (data.data.stock > 0)
+    if (data.data.stock > 0 && data.data.sellerId !== user.id)
     {
       if (productInCart(parseInt($$('#productId').val())))
       {
@@ -326,7 +343,16 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
     }
     else
     {
-      $$('#cartButton').attr('disabled', 'disabled').html('Out of Stock');
+      var disabledText = ''
+      if (data.data.stock === 0)
+      {
+        disabledText += 'Out of Stock';
+      }
+      else
+      {
+        disabledText += 'You can\'t buy your own product';
+      }
+      $$('#cartButton').attr('disabled', 'disabled').html(disabledText);
     }
     app.preloader.hide();
   }});
@@ -422,6 +448,38 @@ $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
   });
   checkTable();
 });
+
+function searchProducts()
+{
+
+    $$('#preloaderText').html('Searching Products...');
+    $$('#productRow').empty();
+    app.preloader.show();
+    app.request({
+      url: 'http://35.200.224.144:8090/api/v1/product/search',
+      method: 'GET',
+      dataType: 'json',
+      data: {query: encodeURI($$('#searchText').val())},
+      success: function (data, status, xhr) {
+      for (var i = 0; i < data.data.length; i++)
+      {
+        $$('#productRow').append($$('<div>').addClass('col-50 product-list-item')
+              .append($$('<a>').attr({
+                                    'href': '/product/'+data.data[i].id+'/'//,
+                                    //'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                  })
+                    .append($$('<img>').attr({
+                                          'src': data.data[i].imgPath,
+                                          'alt': data.data[i].productName,
+                                          'title': data.data[i].productName
+                                      }))
+                    .append($$('<p>').html(data.data[i].productName+' ('+data.data[i].stock+')'))
+                )
+              );
+      }
+      app.preloader.hide();
+    }});
+}
 
 function checkTable()
 {
@@ -553,6 +611,7 @@ function loginStart()
     var username = $$('#my-login-screen [name="username"]').val();
     var password = $$('#my-login-screen [name="password"]').val();
 
+    app.preloader.show();
     app.request({
       url: 'http://35.200.224.144:8090/api/v1/login',
       method: 'POST',
@@ -563,13 +622,14 @@ function loginStart()
       securityToken = data.user.token;
       $$('#my-login-screen [name="username"]').val('');
       $$('#my-login-screen [name="password"]').val('');
+      app.preloader.hide();
       $$("#dashboardLink").click();
-    },
-    error: function (xhr, status)
-    {
-      console.log(xhr);
-    }
-  });
+      },
+      error: function (xhr, status)
+      {
+        console.log(xhr);
+      }
+    });
   //var mainView = app.addView('.view-main')
 
   // Load page from about.html file to main View:
