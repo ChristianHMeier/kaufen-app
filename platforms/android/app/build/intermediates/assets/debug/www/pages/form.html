@@ -12,14 +12,14 @@
   </div>
   <div class="page-content">
     <div class="block-title">Upload Product</div>
-    <div class="list no-hairlines-md">
+    <div id="productForm" class="list no-hairlines-md">
       <ul>
         <li>
           <div class="item-content item-input">
             <div class="item-inner">
               <div class="item-title item-label">Product Name</div>
               <div class="item-input-wrap">
-                <input type="text" placeholder="Product name"/>
+                <input id="productName" type="text" placeholder="Product name"/>
               </div>
             </div>
           </div>
@@ -29,7 +29,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Description</div>
               <div class="item-input-wrap">
-                <textarea placeholder="Describe the product in detail..."></textarea>
+                <textarea id="description" placeholder="Describe the product in detail..."></textarea>
               </div>
             </div>
           </div>
@@ -39,7 +39,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Price (€)</div>
               <div class="item-input-wrap">
-                <input type="number" min="0.25" max="9999.99" step="0.01" />
+                <input id="price" type="number" min="0.25" max="9999.99" step="0.01" />
               </div>
             </div>
           </div>
@@ -49,7 +49,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Height (cm)</div>
               <div class="item-input-wrap">
-                <input type="number" min="0.25" max="9999.99" step="0.01" />
+                <input id="height" type="number" min="0.25" max="9999.99" step="0.01" />
               </div>
             </div>
           </div>
@@ -59,7 +59,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Length (cm)</div>
               <div class="item-input-wrap">
-                <input type="number" min="0.25" max="9999.99" step="0.01" />
+                <input id="length" type="number" min="0.25" max="9999.99" step="0.01" />
               </div>
             </div>
           </div>
@@ -69,7 +69,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Depth (cm)</div>
               <div class="item-input-wrap">
-                <input type="number" min="0.25" max="9999.99" step="0.01" />
+                <input id="depth" type="number" min="0.25" max="9999.99" step="0.01" />
               </div>
             </div>
           </div>
@@ -79,7 +79,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Weight (g)</div>
               <div class="item-input-wrap">
-                <input type="number" min="0.25" max="9999.99" step="0.01" />
+                <input id="weight" type="number" min="0.25" max="9999.99" step="0.01" />
               </div>
             </div>
           </div>
@@ -89,7 +89,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Stock</div>
               <div class="item-input-wrap">
-                <input type="number" min="1" max="999" step="1" />
+                <input id="stock" type="number" min="1" max="999" step="1" />
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Type</div>
               <div class="item-input-wrap">
-                <select>
+                <select id="type">
                   <option value="1">Physical</option>
                   <option value="2">Service</option>
                   <option value="3">Digital</option>
@@ -113,7 +113,7 @@
             <div class="item-inner">
               <div class="item-title item-label">Condition</div>
               <div class="item-input-wrap">
-                <select>
+                <select id="condition">
                   <option value="1">New</option>
                   <option value="2">Refurbished</option>
                   <option value="3">Little Use</option>
@@ -130,8 +130,8 @@
             <div class="item-inner">
               <div class="item-title item-label">Category</div>
               <div class="item-input-wrap">
-                <select>
-                  <!-- will be filled with AJAX-->
+                <!-- will be filled with AJAX-->
+                <select id="category">
                 </select>
               </div>
             </div>
@@ -142,16 +142,18 @@
             <div class="item-inner">
               <div class="item-title item-label">Image</div>
               <div class="item-input-wrap">
-                <input type="file" />
+                <input id="imageFile" type="file"accept="image/*;capture=camera" />
               </div>
             </div>
           </div>
         </li>
       </ul>
+        <p class="row">
+          <a href="#" id="upload" class="col button button-big button-fill button-raised color-green">Upload</a>
+        </p>
     </div>
-      <p class="row">
-        <a href="#" class="col button button-big button-fill button-raised color-red">Upload</a>
-        <input type="submit" value="Big Green" class="col button button-big button-fill button-raised color-green"/>
+      <p id="feedback" class="row">
+        Product Uploaded
       </p>
     </div>
   </div>

@@ -4,16 +4,8 @@ routes = [
     url: './index.html',
   },
   {
-    path: '/stock/',
-    url: './pages/stock.html',
-  },
-  {
     path: '/form/',
     url: './pages/form.html',
-  },
-  {
-    path: '/manage/',
-    url: './pages/manage.html',
   },
   {
     path: '/history/',
@@ -97,89 +89,6 @@ routes = [
           </div>
         </div>
       </div>
-    </div>`
-  },
-  {
-    path: '/order/:id/',
-    //url: './pages/update.html',
-    template: `<div class="page" data-name="order">
-      <div class="navbar">
-        <div class="navbar-inner sliding">
-          <div class="left">
-            <a href="#" class="link back">
-              <i class="icon icon-back"></i>
-              <span class="ios-only">Back</span>
-            </a>
-          </div>
-          <div class="title">Order Details</div>
-        </div>
-      </div>
-      <div class="page-content">
-      <div class="block"> <!--block-strong-->
-        <div class="row">
-        <div class="col-50">
-          Order ID
-        </div>
-        <div class="col-50">
-          {{$route.params.id}}
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-50">
-          Customer
-        </div>
-        <div class="col-50"></div>
-      </div>
-        <div class="row">
-        <div class="col-50">
-          Status
-        </div>
-        <div class="col-50"></div>
-      </div>
-      <div class="row">
-        <div class="col-50">
-          Amount (€)
-        </div>
-        <div class="col-50"></div>
-      </div>
-        <div class="row">
-        <div class="col-50">
-          Date of Order
-        </div>
-        <div class="col-50"></div>
-      </div>
-      <div class="row">
-        <div class="col-50">
-          Date Finished
-        </div>
-        <div class="col-50"></div>
-      </div>
-    </div>
-    <div class="block">
-    <div class="data-table">
-      <table id="itemsTable">
-        <thead>
-          <tr>
-            <th class="numeric-cell">Product</th>
-            <th class="label-cell">Quantity</th>
-            <th class="numeric-cell">Subtotal</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="label-cell"></td>
-            <td class="numeric-cell"></td>
-            <td class="numeric-cell"></td>
-          </tr>
-        </tbody>
-        <tfooter>
-          <tr>
-            <th class="numeric-cell">Product</th>
-            <th class="label-cell">Quantity</th>
-            <th class="numeric-cell">Subtotal</th>
-          </tr>
-        </tfooter>
-    </div>
     </div>`
   },
   // Page Loaders & Router

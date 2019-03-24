@@ -37,43 +37,21 @@ var securityToken;
 var cart = [];
 var searchText = '';
 
-//loginStart();
+/*
+ * The following blocks are code that executes when different screens are loaded
+ */
+
+//login screen
 $$(document).on('page:init', '.page[data-name="home"]', function (e)
 {
   loginStart();
 });
+//Dashboard screen
 $$(document).on('page:init', '.page[data-name="dashboard"]', function (e)
 {
   $$('#name').html(user.firstName);
-  //alert(user.id);
-  //alert(securityToken);
-//  $$("#testLink").on('click', function()
-  //{
-    //app.dialog.alert('JS Dialog Alert works.','Notice');
-    /*var dialog =*/ //{//create({
-      /*text:*/
-      //close: true,
-      //buttonOk: 'Close',
-       /*'Notice');
-      /*on: {
-        opened: function () {
-          console.log('Dialog opened');
-        }
-      }
-    });
-    //dialog.open();
-    //var test = app.dialog.get(el);
-    //test.open();*/
-  //});
 });
-$$(document).on('page:init', '.page[data-name="update"]', function (e)
-{
-  $$("#updateStatusSubmit").on('click', function()
-  {
-    //var text = $$('#updateStatusSelect').find('option').eq($$('#updateStatusSelect').index()).text();
-    app.dialog.alert('Order ID '+$$('#updateOrderId').val()+' set to ('+$$('#updateStatusSelect').val()+')','Placeholder Notice');
-  });
-});
+//Product upload screen
 $$(document).on('page:init', '.page[data-name="form"]', function (e)
 {
     app.request({
@@ -81,22 +59,17 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
       method: 'GET',
       dataType: 'json',
       success: function (data, status, xhr) {
-      //alert(JSON.stringify(data));
       for (var i = 0; i < data.data.length; i++)
       {
         $$('#category').append($$('<option>').attr({'value': data.data[i].categoryId, 'text': data.data[i].categoryName}));
       }
     }});
     $$('#feedback').hide();
+    //Bind event to product upload
     $$('#upload').on('click', function()
     {
-      /*if (document.getElementById("imageFile").files.length > 0)
-      {
-        alert('No file selected');
-      }*/
         var dataPost = {
           "categoryId": $$('#category').val(),
-          //"categoryName": $$('#category').val(),
           "depth": $$('#depth').val(),
           "description": $$('#description').val(),
           "height": $$('#height').val(),
@@ -105,7 +78,7 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           "price": $$('#price').val(),
           "prodCondition": $$('#prodCondition').val(),
           "productName": $$('#productName').val(),
-          "publicationDate": new Date().toISOString().slice(0, 28),//19).replace('T', ' '),
+          "publicationDate": new Date().toISOString().slice(0, 28),
           "sellerId":user.id,
           "slug": $$('#productName').val().toLowerCase().replace(' ', '-'),
           "stock": $$('#stock').val(),
@@ -114,8 +87,7 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
         };
         var formData = new FormData();
         formData.append("product", JSON.stringify(dataPost));
-        formData.append("file",  document.getElementById("imageFile").files[0]);//fileData);
-        //alert(JSON.stringify(dataPost));
+        formData.append("file",  document.getElementById("imageFile").files[0]);
         app.request({
           url: 'http://35.200.224.144:8090/api/v1/product',
           headers: {Authorization: "Bearer "+securityToken},
@@ -124,12 +96,12 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           dataType: 'json',
           data: formData,
           success: function (data, status, xhr) {
-          //alert(JSON.stringify(data));
             $$('#productForm').hide();
             $$('#feedback').show();
         }});
       });
 });
+//Browse store screen
 $$(document).on('page:init', '.page[data-name="browse"]', function (e)
 {
     $$('#preloaderText').html('Loading Categories...');
@@ -144,7 +116,8 @@ $$(document).on('page:init', '.page[data-name="browse"]', function (e)
       {
         $$('#categoryBlock').append($$('<div>').addClass('row')
           .append($$('<div>').addClass('col-100')
-            .append($$('<a>').addClass('button button-raised button-fill').attr({
+            .append($$('<a>').addClass('button button-raised button-fill')
+                                  .attr({
                                     'href': '/products/'+data.data[i].categoryId+'/',
                                     'text': data.data[i].categoryName+' ('+data.data[i].categoryCount+')'
                                   })
@@ -193,26 +166,23 @@ $$(document).on('page:init', '.page[data-name="products"]', function (e)
     dataType: 'json',
     data: dataBody,
     success: function (data, status, xhr) {
-    //alert(JSON.stringify(data));
     for (var i = 0; i < data.data.length; i++)
     {
       $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
-            .append($$('<a>').attr({
-                                  'href': '/product/'+data.data[i].id+'/'//,
-                                  //'text': data.data[i].productName+' ('+data.data[i].stock+')'
-                                })
-                  .append($$('<img>').attr({
-                                        'src': data.data[i].imgPath,
-                                        'alt': data.data[i].productName,
-                                        'title': data.data[i].productName
-                                    }))
-                  .append($$('<p>').html(data.data[i].productName+' ('+data.data[i].stock+')'))
+            .append($$('<a>').attr({'href': '/product/'+data.data[i].id+'/'})
+                .append($$('<img>').attr({
+                                      'src': data.data[i].imgPath,
+                                      'alt': data.data[i].productName,
+                                      'title': data.data[i].productName
+                                  }))
+                .append($$('<p>').html(data.data[i].productName+' ('+data.data[i].stock+')'))
               )
             );
     }
     app.preloader.hide();
   }});
 });
+//Order history
 $$(document).on('page:init', '.page[data-name="history"]', function (e)
 {
 
@@ -224,7 +194,6 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
     headers: {Authorization: "Bearer "+securityToken},
     dataType: 'json',
     success: function (data, status, xhr) {
-    //alert(JSON.stringify(data));
     if (data.data.length === 0)
     {
       $$('#productContent').append($$('<div>').addClass('col-50').html('You have not purchased anything yet.'));
@@ -242,58 +211,68 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
                                   })
                 )
           )
-          .append($$('<div>').addClass('col-20 product-list-item').html(data.data[i].price.toFixed(2).replace('.', ',')+' €'))
-          .append($$('<div>').addClass('col-30 product-list-item').html(data.data[i].purchaseDate.replace('T', ' ').slice(0, 19)));
+          .append($$('<div>')
+            .addClass('col-20 product-list-item')
+            .html(data.data[i].price.toFixed(2).replace('.', ',')+' €'))
+          .append($$('<div>')
+            .addClass('col-30 product-list-item')
+            .html(data.data[i].purchaseDate.replace('T', ' ').slice(0, 19)));
       }
       app.preloader.hide();
     }
   }});
 });
-  $$(document).on('page:init', '.page[data-name="my-products"]', function (e)
-  {
-
-    $$('#preloaderText').html('Loading Your Products...');
-    app.preloader.show();
-    app.request({
-      url: 'http://35.200.224.144:8090/api/v1/product/',//seller/'+user.id,
-      method: 'GET',
-      headers: {Authorization: "Bearer "+securityToken},
-      dataType: 'json',
-      success: function (data, status, xhr) {
-      var myProducts = [];
-      for (var i = 0; i < data.data.length; i++)
+//Products uploaded by the user
+$$(document).on('page:init', '.page[data-name="my-products"]', function (e)
+{
+  $$('#preloaderText').html('Loading Your Products...');
+  app.preloader.show();
+  app.request({
+    url: 'http://35.200.224.144:8090/api/v1/product/',//seller/'+user.id,
+    method: 'GET',
+    headers: {Authorization: "Bearer "+securityToken},
+    dataType: 'json',
+    success: function (data, status, xhr) {
+    var myProducts = [];
+    for (var i = 0; i < data.data.length; i++)
+    {
+      if (data.data[i].sellerId === user.id)
       {
-        if (data.data[i].sellerId === user.id)
-        {
-          myProducts.push(data.data[i]);
-        }
+        myProducts.push(data.data[i]);
       }
-      if (myProducts.length === 0)
-      {
-        $$('#productContent').append($$('<div>').addClass('col-50').html('You have not published anything yet.'));
-      }
-      else
-      {
+    }
+    if (myProducts.length === 0)
+    {
+      $$('#productContent').append($$('<div>')
+        .addClass('col-50')
+        .html('You have not published anything yet.'));
+    }
+    else
+    {
         for (var i = 0; i < myProducts.length; i++)
-        {
-          $$('#productContent').append($$('<div>').addClass('col-50 product-list-item')
-                .append($$('<a>').attr({
-                                      'href': '/product/'+myProducts[i].id+'/',
-                                      'text': myProducts[i].productName+' ('+myProducts[i].stock+')'
-                                    })
-                      .append($$('<img>').attr({
-                                            'src': myProducts[i].imgPath,
-                                            'alt': myProducts[i].productName,
-                                            'title': myProducts[i].productName
-                                        }))
-                      .append($$('<p>').attr({'text': myProducts[i].productName+' ('+myProducts[i].stock+')'}))
-                  )
-                );
-        }
+      {
+        $$('#productContent').append($$('<div>')
+          .addClass('col-50 product-list-item')
+          .append($$('<a>')
+            .attr({
+                    'href': '/product/'+myProducts[i].id+'/',
+                    'text': myProducts[i].productName+' ('+myProducts[i].stock+')'
+                  })
+            .append($$('<img>').attr({
+                                      'src': myProducts[i].imgPath,
+                                      'alt': myProducts[i].productName,
+                                      'title': myProducts[i].productName
+                                    }))
+            .append($$('<p>')
+              .attr({'text': myProducts[i].productName+' ('+myProducts[i].stock+')'}))
+                )
+              );
       }
-      app.preloader.hide();
-    }});
+    }
+    app.preloader.hide();
+  }});
 });
+//Product screen
 $$(document).on('page:init', '.page[data-name="product"]', function (e)
 {
   $$('#preloaderText').html('Loading Product Data...');
@@ -322,7 +301,6 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
         if (!inCart)
         {
           var product = JSON.parse($$('#productData').val());
-          //Add the buyer id so it can be used in the later POST request
           product.buyerId = user.id;
           cart.push(product);
           $$('#cartButton').html('Remove from Cart');
@@ -358,6 +336,7 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
   }});
 
 });
+//New user screen
 $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
 {
   $$('#feedback').hide();
@@ -368,51 +347,53 @@ $$(document).on('page:init', '.page[data-name="new-user"]', function (e)
       hashpw($$('#pass').val(), salt, hashing);
   });
 });
+//Edit user account screen
 $$(document).on('page:init', '.page[data-name="my-account"]', function (e)
 {
-  /*$$('#feedback').hide();
-    app.request({
-      url: 'http://35.200.224.144:8090/api/v1/user/',
-      method: 'GET',
-      headers: {Authorization: "Bearer "+securityToken},
-      data: {user.id: user.id},
-      dataType: 'json',
-      success: function (data, status, xhr) {*/
-      //alert(JSON.stringify(data));
-      $$('#firstName').val(user.firstName);
-      $$('#surname').val(user.lastName);
-      $$('#alias').val(user.alias);
-      $$('#email').val(user.emailId);
-      $$('#country').val(user.country);
-      $$('#state').val(user.state);
-      $$('#city').val(user.city);
-      $$('#postCode').val(user.postCode);
-      $$('#address').val(user.address);
-      $$('#phone').val(user.phoneNo);
-      $$('#feedback').hide();
-  //});
+  $$('#firstName').val(user.firstName);
+  $$('#surname').val(user.lastName);
+  $$('#alias').val(user.alias);
+  $$('#email').val(user.emailId);
+  $$('#country').val(user.country);
+  $$('#state').val(user.state);
+  $$('#city').val(user.city);
+  $$('#postCode').val(user.postCode);
+  $$('#address').val(user.address);
+  $$('#phone').val(user.phoneNo);
+  $$('#feedback').hide();
   $$('#register').on('click', function()
   {
       var salt = gensalt(12);
       hashpw($$('#pass').val(), salt, updating);
   });
-
 });
+//Cart checkout screen
 $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
 {
   for (var i = 0; i < cart.length; i++)
   {
     $$('#cartTable').append($$('<div>').addClass('row').addClass('cartRow')
       .append($$('<div>').addClass('col-5')
-        .append($$('<img>').attr({'alt': cart[i].productName, 'title': cart[i].productName, 'src': cart[i].imgPath}))
+        .append($$('<img>').attr({
+                                  'alt': cart[i].productName,
+                                  'title': cart[i].productName,
+                                  'src': cart[i].imgPath
+                                }))
       )
       .append($$('<div>').addClass('col-60')
         .append($$('<span>').html(cart[i].productName))
       )
-      .append($$('<div>').addClass('col-20').html(cart[i].price.toString().replace('.', ',')+' €'))
+      .append($$('<div>')
+        .addClass('col-20')
+        .html(cart[i].price.toString().replace('.', ',')+' €'))
       .append($$('<div>').addClass('col-15')
         .append($$('<input>')
-          .attr({'type': 'button', 'value': 'X', 'data-id': cart[i].id, 'data-index': i})
+          .attr({
+                  'type': 'button',
+                  'value': 'X',
+                  'data-id': cart[i].id,
+                  'data-index': i
+                })
           .on('click', function()
           {
             cart.splice(parseInt($$(this).attr('data-index')), 1);
@@ -426,14 +407,13 @@ $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
   $$('#orderButton').on('click', function()
   {
     $$('#preloaderText').html('Submitting order...');
-    //app.preloader.show();
     app.request({
       url: 'http://35.200.224.144:8090/api/v1/product/buy',
       method: 'POST',
       headers: {
                 Authorization: "Bearer "+securityToken
               },
-      contentType: 'application/json',//'multipart/form-data',
+      contentType: 'application/json',
       dataType: 'json',
       data: JSON.stringify(cart),
       success: function (data, status, xhr) {
@@ -441,7 +421,6 @@ $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
         $$('.cartRow').remove();
         checkTable();
         $$('#cartTable, #totalRow').hide();
-        //$$('#orderButton').parent().hide();
         $$('#feedback').html(data.message).show();
         app.preloader.hide();
     }});
@@ -449,9 +428,9 @@ $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
   checkTable();
 });
 
+//Auxiliary function for the product search
 function searchProducts()
 {
-
     $$('#preloaderText').html('Searching Products...');
     $$('#productRow').empty();
     app.preloader.show();
@@ -465,8 +444,7 @@ function searchProducts()
       {
         $$('#productRow').append($$('<div>').addClass('col-50 product-list-item')
               .append($$('<a>').attr({
-                                    'href': '/product/'+data.data[i].id+'/'//,
-                                    //'text': data.data[i].productName+' ('+data.data[i].stock+')'
+                                    'href': '/product/'+data.data[i].id+'/'
                                   })
                     .append($$('<img>').attr({
                                           'src': data.data[i].imgPath,
@@ -480,7 +458,7 @@ function searchProducts()
       app.preloader.hide();
     }});
 }
-
+//Auxuliary function for the Checkout screen
 function checkTable()
 {
   var total = 0;
@@ -500,6 +478,7 @@ function checkTable()
   }
   $$('#cartTotal').html(total.toFixed(2).toString().replace('.', ','));
 }
+//Auxiliary function for the product screen
 function productInCart(id)
 {
     let inCart = false;
@@ -513,18 +492,12 @@ function productInCart(id)
     }
     return inCart;
 }
-
+//Callback function when a new user is registered and the password must be hashed
 function hashing(hash)
 {
-  //alert('Hash is '+hash);
-  //hashed = hash;
-
   var dataPost = {
     "address": $$('#address').val(),
     "alias": $$('#alias').val(),
-    /*"authorities": {
-      "authority": "ROLE_USER"
-    },*/
     "city": $$('#city').val(),
     "country": $$('#country').val(),
     "emailId": $$('#email').val(),
@@ -537,31 +510,24 @@ function hashing(hash)
     "state": $$('#state').val()
   };
   $$('#preloaderText').html('Creating your user account...');
-  //app.preloader.show();
   app.request({
     url: 'http://35.200.224.144:8090/api/v1/user',
     method: 'POST',
-    contentType: 'application/json',//'multipart/form-data',
+    contentType: 'application/json',
     dataType: 'json',
     data: JSON.stringify(dataPost),
     success: function (data, status, xhr) {
-    //alert(JSON.stringify(data));
       $$('#userForm').hide();
       $$('#feedback').show();
       app.preloader.hide();
   }});
 }
+//Callback function when a logged user updates their data
 function updating(hash)
 {
-  //alert('Hash is '+hash);
-  //hashed = hash;
-
   var dataPut = {
     "address": $$('#address').val(),
     "alias": $$('#alias').val(),
-    /*"authorities": {
-      "authority": "ROLE_USER"
-    },*/
     "id": user.id,
     "city": $$('#city').val(),
     "country": $$('#country').val(),
@@ -604,9 +570,9 @@ function updating(hash)
   }
 });
 }
+//Auxiliary function for the login screen
 function loginStart()
 {
-  // Login Screen Demo
   $$('#my-login-screen .login-button').on('click', function () {
     var username = $$('#my-login-screen [name="username"]').val();
     var password = $$('#my-login-screen [name="password"]').val();
@@ -630,14 +596,5 @@ function loginStart()
         console.log(xhr);
       }
     });
-  //var mainView = app.addView('.view-main')
-
-  // Load page from about.html file to main View:
-  //mainView.router.loadPage('pages/dashboard.html');
-  // Close login screen
-  //app.loginScreen.close('#my-login-screen');
-
-  // Alert username and password
-  //app.dialog.alert('Username: ' + username + '<br>Password: ' + password);
   });
 }
