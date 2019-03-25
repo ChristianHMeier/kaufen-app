@@ -63,6 +63,12 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
       {
         $$('#category').append($$('<option>').attr({'value': data.data[i].categoryId, 'text': data.data[i].categoryName}));
       }
+    },
+    error:	function (xhr, status)
+    {
+      let response = JSON.stringify(xhr.response);
+      alert(response.message);
+      app.preloader.hide();
     }});
     $$('#feedback').hide();
     //Bind event to product upload
@@ -98,6 +104,12 @@ $$(document).on('page:init', '.page[data-name="form"]', function (e)
           success: function (data, status, xhr) {
             $$('#productForm').hide();
             $$('#feedback').show();
+        },
+        error:	function (xhr, status)
+        {
+          let response = JSON.stringify(xhr.response);
+          alert(response.message);
+          app.preloader.hide();
         }});
       });
 });
@@ -125,6 +137,12 @@ $$(document).on('page:init', '.page[data-name="browse"]', function (e)
               )
             );
       }
+      app.preloader.hide();
+    },
+    error:	function (xhr, status)
+    {
+      let response = JSON.stringify(xhr.response);
+      alert(response.message);
       app.preloader.hide();
     }});
     if (searchText !== '')
@@ -180,6 +198,12 @@ $$(document).on('page:init', '.page[data-name="products"]', function (e)
             );
     }
     app.preloader.hide();
+  },
+  error:	function (xhr, status)
+  {
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
+    app.preloader.hide();
   }});
 });
 //Order history
@@ -218,8 +242,14 @@ $$(document).on('page:init', '.page[data-name="history"]', function (e)
             .addClass('col-30 product-list-item')
             .html(data.data[i].purchaseDate.replace('T', ' ').slice(0, 19)));
       }
-      app.preloader.hide();
     }
+    app.preloader.hide();
+  },
+  error:	function (xhr, status)
+  {
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
+    app.preloader.hide();
   }});
 });
 //Products uploaded by the user
@@ -269,6 +299,12 @@ $$(document).on('page:init', '.page[data-name="my-products"]', function (e)
               );
       }
     }
+    app.preloader.hide();
+  },
+  error:	function (xhr, status)
+  {
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
     app.preloader.hide();
   }});
 });
@@ -328,10 +364,16 @@ $$(document).on('page:init', '.page[data-name="product"]', function (e)
       }
       else
       {
-        disabledText += 'You can\'t buy your own product';
+        disabledText += 'You posted this product';
       }
       $$('#cartButton').attr('disabled', 'disabled').html(disabledText);
     }
+    app.preloader.hide();
+  },
+  error:	function (xhr, status)
+  {
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
     app.preloader.hide();
   }});
 
@@ -423,6 +465,12 @@ $$(document).on('page:init', '.page[data-name="checkout"]', function (e)
         $$('#cartTable, #totalRow').hide();
         $$('#feedback').html(data.message).show();
         app.preloader.hide();
+    },
+    error:	function (xhr, status)
+    {
+      let response = JSON.stringify(xhr.response);
+      alert(response.message);
+      app.preloader.hide();
     }});
   });
   checkTable();
@@ -455,6 +503,12 @@ function searchProducts()
                 )
               );
       }
+      app.preloader.hide();
+    },
+    error:	function (xhr, status)
+    {
+      let response = JSON.stringify(xhr.response);
+      alert(response.message);
       app.preloader.hide();
     }});
 }
@@ -520,6 +574,12 @@ function hashing(hash)
       $$('#userForm').hide();
       $$('#feedback').show();
       app.preloader.hide();
+  },
+  error:	function (xhr, status)
+  {
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
+    app.preloader.hide();
   }});
 }
 //Callback function when a logged user updates their data
@@ -565,8 +625,9 @@ function updating(hash)
   },
   error:	function (xhr, status)
   {
-    console.log(xhr);
-    console.log(status);
+    let response = JSON.stringify(xhr.response);
+    alert(response.message);
+    app.preloader.hide();
   }
 });
 }
@@ -591,9 +652,18 @@ function loginStart()
       app.preloader.hide();
       $$("#dashboardLink").click();
       },
-      error: function (xhr, status)
+      error:	function (xhr, status)
       {
-        console.log(xhr);
+        if (status === 401)
+        {
+          alert('Wrong email or password.')
+        }
+        else
+        {
+          let response = JSON.stringify(xhr.response);
+          alert(response.message);
+        }
+        app.preloader.hide();
       }
     });
   });

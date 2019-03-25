@@ -80,12 +80,14 @@ routes = [
         <div class="block-title">Product Details</div>
         <div class="block"> <!--block-strong-->
           <div id="productContent" class="row">
-            <div class="col-50">
+            <div class="col-60">
               <img id="productImage" />
               <a href="#" id="cartButton" class="col button button-big button-fill button-raised color-green">Add to Cart</a>
+            </div>
+            <div class="col-40" id="productDetails"></div>
+            <div class="col-60">
               <a href="/checkout/" class="col button button-big button-fill button-raised color-red">Go to Checkout</a>
             </div>
-            <div class="col-50" id="productDetails"></div>
           </div>
         </div>
       </div>
